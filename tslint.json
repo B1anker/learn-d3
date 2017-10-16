@@ -1,0 +1,18 @@
+{
+  "defaultSeverity": "error",
+  "extends": "tslint:latest",
+  "jsRules": {
+    
+  },
+  "rules": {
+    "space-before-function-paren": true,
+    "no-console": false,
+    "quotemark": [true, "single", "jsx-double"],
+    "interface-name": [true, "never-prefix"],
+    "object-literal-sort-keys": false,
+    "trailing-comma": [false, {
+      "multiline": "always",
+      "singleline": "never"
+    }]
+  }
+}
