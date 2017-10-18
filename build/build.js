@@ -15,6 +15,8 @@ watcher.on('event', (e) => {
     console.log('compilling...')
   } else if (e.code === 'END') {
     console.log('finish')
+  } else if (e.code === 'FATAL') {
+    console.log(e)
   }
 })
 
