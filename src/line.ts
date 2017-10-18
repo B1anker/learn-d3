@@ -1,94 +1,52 @@
 import { max } from 'd3-array';
-import { scaleBand, scaleLinear } from 'd3-scale';
-import { BaseType, select, Selection } from 'd3-selection';
-import { CanvasSize } from './declare';
-import Axis, { ChartSize } from './materials/axis';
+import { scaleLinear } from 'd3-scale';
+import Axis from './materials/axis';
+
+interface SvgSize {
+  width: number;
+  height: number;
+}
 
 interface Boundary {
-  left: number;
   top: number;
-  bottom: number;
   right: number;
+  left: number;
+  bottom: number;
 }
 
-export default function () {
-  const boundary: Boundary = {
-    top: 20,
-    right: 20,
-    bottom: 20,
-    left: 20
-  };
-  const canvasSize: CanvasSize = {
-    width: 400,
-    height: 400
-  };
-  const chartSize: ChartSize = {
-    width: canvasSize.width - boundary.left - boundary.right,
-    height: canvasSize.height - boundary.top - boundary.bottom
-  };
-  const rectStop: number = 35;
-  const rectWidth: number = 30;
+const dataset = [{
+  country: 'china',
+  gdp: [[2000, 11920], [2001, 13170], [2002, 14550], [2003, 16500], [2004, 19440], [2005, 22870], [2006, 27930], [2007, 35040], [2008, 45470], [2009, 51050], [2010, 59490], [2011, 73140], [2012, 83860], [2013, 103550]]
+}, {
+  country: 'japan',
+  gdp: [[2000, 47310], [2001, 41590], [2002, 39800], [2003, 43020], [2004, 46550], [2005, 45710], [2006, 45710], [2007, 43560], [2008, 48490], [2009, 50350], [2010, 54950], [2011, 59050], [2012, 59370], [2013, 48980]]
+}];
 
-  const canvas: any = select ('body').append('canvas')
-    .attr('width', canvasSize.width)
-    .attr('height', canvasSize.height);
-  const ctx: CanvasRenderingContext2D = canvas.node().getContext('2d');
+const svgSize: SvgSize = {
+  width: 300,
+  height: 300
+};
 
-  const data = [{
-    name: '办公用品',
-    value: 100
-  }, {
-    name: '家具',
-    value: 20
-  }, {
-    name: '技术',
-    value: 60
-  }];
+const padding: Boundary = {
+  top: 50,
+  right: 50,
+  left: 50,
+  bottom: 50
+};
 
-  const xAxisRuler = scaleBand().domain(data.map((d) => {
-    return d.name;
-  }))
-    .rangeRound([0, chartSize.width])
-    .padding(.5);
+let gdpMax: number = 0;
 
-  const yAxisRuler = scaleLinear().domain([0, max(data, (d) => {
-    return d.value;
-  })])
-    .rangeRound([chartSize.height, 0]);
-  const yTickCount = 10;
-  const yTicks = yAxisRuler.ticks(yTickCount);
-
-  const xAxis = new Axis(canvas.node(), xAxisRuler, xAxisRuler.domain(), {
-    direction: 'verticle',
-    chartSize: {
-      height: chartSize.height,
-      width: chartSize.width
-    },
-    offset: {
-      x: xAxisRuler.bandwidth() / 2
-    },
-    length: 6
+dataset.forEach((data) => {
+  const currGdp = max(data.gdp, (d) => {
+    return d[1];
   });
-  xAxis.drawScale({
-    color: 'red'
-  });
-  xAxis.drawLine({
-    color: 'green'
-  });
+  if (currGdp > gdpMax) {
+    gdpMax = currGdp;
+  }
+});
 
-  const yAxis = new Axis(canvas.node(), yAxisRuler, yTicks, {
-    direction: 'align',
-    chartSize: {
-      height: chartSize.height,
-      width: chartSize.width
-    },
-    offset: {
-      x: 0
-    },
-    length: 6
-  });
-  yAxis.drawScale({
-    color: 'blue'
-  });
-  yAxis.drawLine();
-}
+const xScale = scaleLinear().domain([2000, 2013])
+  .range([0, svgSize.width - padding.left - padding.right]);
+
+const yScale = scaleLinear().domain([0, gdpMax * 1.1])
+  .range([0, svgSize.width - padding.left - padding.right]);
