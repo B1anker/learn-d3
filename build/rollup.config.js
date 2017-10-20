@@ -9,6 +9,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import ugliy from 'rollup-plugin-uglify'
 import hash from 'rollup-plugin-hash'
 import progress from 'rollup-plugin-progress'
+import alias from 'rollup-plugin-alias';
 import path from 'path'
 
 function resolve (direction) {
@@ -25,6 +26,9 @@ export default {
     nodeResolve({
       jsnext: true,
       main: true
+    }),
+    alias({
+      '@': resolve('../src')
     }),
     sourcemaps(),
     // ugliy(),

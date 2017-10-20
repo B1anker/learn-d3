@@ -886,6 +886,10 @@ chalk@^1.1.1, chalk@^1.1.3:
     strip-ansi "^3.0.0"
     supports-color "^2.0.0"
 
+charenc@~0.0.1:
+  version "0.0.2"
+  resolved "http://npm.kuaizitech.cn/charenc/-/charenc-0.0.2.tgz#c0a1d2f3a7092e03774bfa83f14c0fc5790a8667"
+
 chokidar@1.7.0, chokidar@^1.6.1, chokidar@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-1.7.0.tgz#798e689778151c8076b4b360e5edd28cda2bb468"
@@ -937,10 +941,6 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
 commander@2, commander@^2.11.0, commander@^2.2.0, commander@^2.9.0, commander@~2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
-
-compare-versions@2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-2.0.1.tgz#1edc1f93687fd97a325c59f55e45a07db106aca6"
 
 component-bind@1.0.0:
   version "1.0.0"
@@ -1009,11 +1009,19 @@ core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
+crypt@~0.0.1:
+  version "0.0.2"
+  resolved "http://npm.kuaizitech.cn/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
+
 cryptiles@2.x.x:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-2.0.5.tgz#3bdfecdc608147c1c67202fa291e7dca59eaa3b8"
   dependencies:
     boom "2.x.x"
+
+crypto@^1.0.1:
+  version "1.0.1"
+  resolved "http://npm.kuaizitech.cn/crypto/-/crypto-1.0.1.tgz#2af1b7cad8175d24c8a1b0778255794a21803037"
 
 d3-array@1, d3-array@1.2.1, d3-array@^1.2.0:
   version "1.2.1"
@@ -1779,7 +1787,7 @@ is-binary-path@^1.0.0:
   dependencies:
     binary-extensions "^1.0.0"
 
-is-buffer@^1.1.5:
+is-buffer@^1.1.5, is-buffer@~1.1.1:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.5.tgz#1f3b26ef613b214b88cbca23cc6c01d87961eecc"
 
@@ -2020,6 +2028,14 @@ magic-string@^0.22.4:
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.22.4.tgz#31039b4e40366395618c1d6cf8193c53917475ff"
   dependencies:
     vlq "^0.2.1"
+
+md5@^2.2.1:
+  version "2.2.1"
+  resolved "http://npm.kuaizitech.cn/md5/-/md5-2.2.1.tgz#53ab38d5fe3c8891ba465329ea23fac0540126f9"
+  dependencies:
+    charenc "~0.0.1"
+    crypt "~0.0.1"
+    is-buffer "~1.1.1"
 
 micromatch@2.3.11, micromatch@^2.1.5, micromatch@^2.3.11:
   version "2.3.11"
@@ -2564,6 +2580,12 @@ rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1:
   dependencies:
     glob "^7.0.5"
 
+rollup-plugin-alias@^1.4.0:
+  version "1.4.0"
+  resolved "http://npm.kuaizitech.cn/rollup-plugin-alias/-/rollup-plugin-alias-1.4.0.tgz#120cba7c46621c03138f0ca6fd5dd2ade9872db9"
+  dependencies:
+    slash "^1.0.0"
+
 rollup-plugin-browsersync@^0.2.4:
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/rollup-plugin-browsersync/-/rollup-plugin-browsersync-0.2.4.tgz#02f75d9f6b1266582faaca1cb328f52c992131e2"
@@ -2639,23 +2661,13 @@ rollup-plugin-typescript2@^0.7.0:
     rollup-pluginutils "^2.0.1"
     tslib "^1.7.1"
 
-rollup-plugin-typescript@^0.8.1:
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-typescript/-/rollup-plugin-typescript-0.8.1.tgz#2ff7eecc21cf6bb2b43fc27e5b688952ce71924a"
-  dependencies:
-    compare-versions "2.0.1"
-    object-assign "^4.0.1"
-    rollup-pluginutils "^1.3.1"
-    tippex "^2.1.1"
-    typescript "^1.8.9"
-
 rollup-plugin-uglify@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/rollup-plugin-uglify/-/rollup-plugin-uglify-2.0.1.tgz#67b37ad1efdafbd83af4c36b40c189ee4866c969"
   dependencies:
     uglify-js "^3.0.9"
 
-rollup-pluginutils@^1.3.1, rollup-pluginutils@^1.5.1:
+rollup-pluginutils@^1.5.1:
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/rollup-pluginutils/-/rollup-pluginutils-1.5.2.tgz#1e156e778f94b7255bfa1b3d0178be8f5c552408"
   dependencies:
@@ -2946,10 +2958,6 @@ tfunk@^3.0.1:
     chalk "^1.1.1"
     object-path "^0.9.0"
 
-tippex@^2.1.1:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/tippex/-/tippex-2.3.1.tgz#a2fd5b7087d7cbfb20c9806a6c16108c2c0fafda"
-
 to-array@0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/to-array/-/to-array-0.1.4.tgz#17e6c11f73dd4f3d74cda7a4ff3238e9ad9bf890"
@@ -3002,10 +3010,6 @@ tunnel-agent@^0.6.0:
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
-
-typescript@^1.8.9:
-  version "1.8.10"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-1.8.10.tgz#b475d6e0dff0bf50f296e5ca6ef9fbb5c7320f1e"
 
 typescript@^2.5.3:
   version "2.5.3"
@@ -3060,7 +3064,7 @@ utils-merge@1.0.0:
 
 uuid@^3.0.0:
   version "3.1.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
+  resolved "http://npm.kuaizitech.cn/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
 
 v8flags@^2.1.1:
   version "2.1.1"
