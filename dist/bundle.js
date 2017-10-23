@@ -38,6 +38,132 @@ var __assign = Object.assign || function __assign(t) {
     return t;
 };
 
+var ascending = function(a, b) {
+  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+};
+
+var bisector = function(compare) {
+  if (compare.length === 1) compare = ascendingComparator(compare);
+  return {
+    left: function(a, x, lo, hi) {
+      if (lo == null) lo = 0;
+      if (hi == null) hi = a.length;
+      while (lo < hi) {
+        var mid = lo + hi >>> 1;
+        if (compare(a[mid], x) < 0) lo = mid + 1;
+        else hi = mid;
+      }
+      return lo;
+    },
+    right: function(a, x, lo, hi) {
+      if (lo == null) lo = 0;
+      if (hi == null) hi = a.length;
+      while (lo < hi) {
+        var mid = lo + hi >>> 1;
+        if (compare(a[mid], x) > 0) hi = mid;
+        else lo = mid + 1;
+      }
+      return lo;
+    }
+  };
+};
+
+function ascendingComparator(f) {
+  return function(d, x) {
+    return ascending(f(d), x);
+  };
+}
+
+var ascendingBisect = bisector(ascending);
+var bisectRight = ascendingBisect.right;
+
+var e10 = Math.sqrt(50);
+var e5 = Math.sqrt(10);
+var e2 = Math.sqrt(2);
+
+var ticks = function(start, stop, count) {
+  var reverse,
+      i = -1,
+      n,
+      ticks,
+      step;
+
+  stop = +stop, start = +start, count = +count;
+  if (start === stop && count > 0) return [start];
+  if (reverse = stop < start) n = start, start = stop, stop = n;
+  if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
+
+  if (step > 0) {
+    start = Math.ceil(start / step);
+    stop = Math.floor(stop / step);
+    ticks = new Array(n = Math.ceil(stop - start + 1));
+    while (++i < n) ticks[i] = (start + i) * step;
+  } else {
+    start = Math.floor(start * step);
+    stop = Math.ceil(stop * step);
+    ticks = new Array(n = Math.ceil(start - stop + 1));
+    while (++i < n) ticks[i] = (start - i) / step;
+  }
+
+  if (reverse) ticks.reverse();
+
+  return ticks;
+};
+
+function tickIncrement(start, stop, count) {
+  var step = (stop - start) / Math.max(0, count),
+      power = Math.floor(Math.log(step) / Math.LN10),
+      error = step / Math.pow(10, power);
+  return power >= 0
+      ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
+      : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
+}
+
+function tickStep(start, stop, count) {
+  var step0 = Math.abs(stop - start) / Math.max(0, count),
+      step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
+      error = step0 / step1;
+  if (error >= e10) step1 *= 10;
+  else if (error >= e5) step1 *= 5;
+  else if (error >= e2) step1 *= 2;
+  return stop < start ? -step1 : step1;
+}
+
+var max = function(values, valueof) {
+  var n = values.length,
+      i = -1,
+      value,
+      max;
+
+  if (valueof == null) {
+    while (++i < n) { // Find the first comparable value.
+      if ((value = values[i]) != null && value >= value) {
+        max = value;
+        while (++i < n) { // Compare the remaining values.
+          if ((value = values[i]) != null && value > max) {
+            max = value;
+          }
+        }
+      }
+    }
+  }
+
+  else {
+    while (++i < n) { // Find the first comparable value.
+      if ((value = valueof(values[i], i, values)) != null && value >= value) {
+        max = value;
+        while (++i < n) { // Compare the remaining values.
+          if ((value = valueof(values[i], i, values)) != null && value > max) {
+            max = value;
+          }
+        }
+      }
+    }
+  }
+
+  return max;
+};
+
 var xhtml = "http://www.w3.org/1999/xhtml";
 
 var namespaces = {
@@ -309,7 +435,7 @@ EnterNode.prototype = {
   querySelectorAll: function(selector) { return this._parent.querySelectorAll(selector); }
 };
 
-var constant = function(x) {
+var constant$1 = function(x) {
   return function() {
     return x;
   };
@@ -398,7 +524,7 @@ var selection_data = function(value, key) {
       parents = this._parents,
       groups = this._groups;
 
-  if (typeof value !== "function") value = constant(value);
+  if (typeof value !== "function") value = constant$1(value);
 
   for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
     var parent = parents[j],
@@ -466,7 +592,7 @@ var selection_order = function() {
 };
 
 var selection_sort = function(compare) {
-  if (!compare) compare = ascending;
+  if (!compare) compare = ascending$1;
 
   function compareNode(a, b) {
     return a && b ? compare(a.__data__, b.__data__) : !a - !b;
@@ -484,7 +610,7 @@ var selection_sort = function(compare) {
   return new Selection(sortgroups, this._parents).order();
 };
 
-function ascending(a, b) {
+function ascending$1(a, b) {
   return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 }
 
@@ -920,9 +1046,15 @@ var select = function(selector) {
       : new Selection([[selector]], root);
 };
 
-var slice = Array.prototype.slice;
+var selectAll = function(selector) {
+  return typeof selector === "string"
+      ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
+      : new Selection([selector == null ? [] : selector], root);
+};
 
-var identity = function(x) {
+var slice$1 = Array.prototype.slice;
+
+var identity$1 = function(x) {
   return x;
 };
 
@@ -940,7 +1072,7 @@ function translateY(y) {
   return "translate(0," + (y + 0.5) + ")";
 }
 
-function number(scale) {
+function number$1(scale) {
   return function(d) {
     return +scale(d);
   };
@@ -971,12 +1103,12 @@ function axis(orient, scale) {
 
   function axis(context) {
     var values = tickValues == null ? (scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain()) : tickValues,
-        format = tickFormat == null ? (scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity) : tickFormat,
+        format = tickFormat == null ? (scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity$1) : tickFormat,
         spacing = Math.max(tickSizeInner, 0) + tickPadding,
         range = scale.range(),
         range0 = +range[0] + 0.5,
         range1 = +range[range.length - 1] + 0.5,
-        position = (scale.bandwidth ? center : number)(scale.copy()),
+        position = (scale.bandwidth ? center : number$1)(scale.copy()),
         selection = context.selection ? context.selection() : context,
         path = selection.selectAll(".domain").data([null]),
         tick = selection.selectAll(".tick").data(values, scale).order(),
@@ -1048,15 +1180,15 @@ function axis(orient, scale) {
   };
 
   axis.ticks = function() {
-    return tickArguments = slice.call(arguments), axis;
+    return tickArguments = slice$1.call(arguments), axis;
   };
 
   axis.tickArguments = function(_) {
-    return arguments.length ? (tickArguments = _ == null ? [] : slice.call(_), axis) : tickArguments.slice();
+    return arguments.length ? (tickArguments = _ == null ? [] : slice$1.call(_), axis) : tickArguments.slice();
   };
 
   axis.tickValues = function(_) {
-    return arguments.length ? (tickValues = _ == null ? null : slice.call(_), axis) : tickValues && tickValues.slice();
+    return arguments.length ? (tickValues = _ == null ? null : slice$1.call(_), axis) : tickValues && tickValues.slice();
   };
 
   axis.tickFormat = function(_) {
@@ -1201,6 +1333,7 @@ var formatTypes = {
   "x": function(x) { return Math.round(x).toString(16); }
 };
 
+// [[fill]align][sign][symbol][0][width][,][.precision][type]
 var re = /^(?:(.)?([<>=^]))?([+\-\( ])?([$#])?(0)?(\d+)?(,)?(\.\d+)?([a-z%])?$/i;
 
 function formatSpecifier(specifier) {
@@ -1255,17 +1388,17 @@ FormatSpecifier.prototype.toString = function() {
       + this.type;
 };
 
-var identity$1 = function(x) {
+var identity$2 = function(x) {
   return x;
 };
 
 var prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
 
 var formatLocale = function(locale) {
-  var group = locale.grouping && locale.thousands ? formatGroup(locale.grouping, locale.thousands) : identity$1,
+  var group = locale.grouping && locale.thousands ? formatGroup(locale.grouping, locale.thousands) : identity$2,
       currency = locale.currency,
       decimal = locale.decimal,
-      numerals = locale.numerals ? formatNumerals(locale.numerals) : identity$1,
+      numerals = locale.numerals ? formatNumerals(locale.numerals) : identity$2,
       percent = locale.percent || "%";
 
   function newFormat(specifier) {
@@ -1739,7 +1872,6 @@ function generateId() {
         return String.fromCharCode(parseInt(num, 10) + 65);
     });
 }
-//# sourceMappingURL=id.js.map
 
 var Coordinate = /** @class */ (function () {
     function Coordinate(options) {
@@ -1827,8 +1959,6 @@ var Coordinate = /** @class */ (function () {
     return Coordinate;
 }());
 
-//# sourceMappingURL=coordinate.js.map
-
 var Root = /** @class */ (function () {
     function Root() {
         this.selection = null;
@@ -1838,8 +1968,6 @@ var Root = /** @class */ (function () {
     };
     return Root;
 }());
-
-//# sourceMappingURL=root.js.map
 
 var Highlight = /** @class */ (function (_super) {
     __extends(Highlight, _super);
@@ -1867,134 +1995,6 @@ var Highlight = /** @class */ (function (_super) {
     };
     return Highlight;
 }(Root));
-
-//# sourceMappingURL=highlight.js.map
-
-var ascending$1 = function(a, b) {
-  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
-};
-
-var bisector = function(compare) {
-  if (compare.length === 1) compare = ascendingComparator(compare);
-  return {
-    left: function(a, x, lo, hi) {
-      if (lo == null) lo = 0;
-      if (hi == null) hi = a.length;
-      while (lo < hi) {
-        var mid = lo + hi >>> 1;
-        if (compare(a[mid], x) < 0) lo = mid + 1;
-        else hi = mid;
-      }
-      return lo;
-    },
-    right: function(a, x, lo, hi) {
-      if (lo == null) lo = 0;
-      if (hi == null) hi = a.length;
-      while (lo < hi) {
-        var mid = lo + hi >>> 1;
-        if (compare(a[mid], x) > 0) hi = mid;
-        else lo = mid + 1;
-      }
-      return lo;
-    }
-  };
-};
-
-function ascendingComparator(f) {
-  return function(d, x) {
-    return ascending$1(f(d), x);
-  };
-}
-
-var ascendingBisect = bisector(ascending$1);
-var bisectRight = ascendingBisect.right;
-
-var e10 = Math.sqrt(50);
-var e5 = Math.sqrt(10);
-var e2 = Math.sqrt(2);
-
-var ticks = function(start, stop, count) {
-  var reverse,
-      i = -1,
-      n,
-      ticks,
-      step;
-
-  stop = +stop, start = +start, count = +count;
-  if (start === stop && count > 0) return [start];
-  if (reverse = stop < start) n = start, start = stop, stop = n;
-  if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
-
-  if (step > 0) {
-    start = Math.ceil(start / step);
-    stop = Math.floor(stop / step);
-    ticks = new Array(n = Math.ceil(stop - start + 1));
-    while (++i < n) ticks[i] = (start + i) * step;
-  } else {
-    start = Math.floor(start * step);
-    stop = Math.ceil(stop * step);
-    ticks = new Array(n = Math.ceil(start - stop + 1));
-    while (++i < n) ticks[i] = (start - i) / step;
-  }
-
-  if (reverse) ticks.reverse();
-
-  return ticks;
-};
-
-function tickIncrement(start, stop, count) {
-  var step = (stop - start) / Math.max(0, count),
-      power = Math.floor(Math.log(step) / Math.LN10),
-      error = step / Math.pow(10, power);
-  return power >= 0
-      ? (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1) * Math.pow(10, power)
-      : -Math.pow(10, -power) / (error >= e10 ? 10 : error >= e5 ? 5 : error >= e2 ? 2 : 1);
-}
-
-function tickStep(start, stop, count) {
-  var step0 = Math.abs(stop - start) / Math.max(0, count),
-      step1 = Math.pow(10, Math.floor(Math.log(step0) / Math.LN10)),
-      error = step0 / step1;
-  if (error >= e10) step1 *= 10;
-  else if (error >= e5) step1 *= 5;
-  else if (error >= e2) step1 *= 2;
-  return stop < start ? -step1 : step1;
-}
-
-var max = function(values, valueof) {
-  var n = values.length,
-      i = -1,
-      value,
-      max;
-
-  if (valueof == null) {
-    while (++i < n) { // Find the first comparable value.
-      if ((value = values[i]) != null && value >= value) {
-        max = value;
-        while (++i < n) { // Compare the remaining values.
-          if ((value = values[i]) != null && value > max) {
-            max = value;
-          }
-        }
-      }
-    }
-  }
-
-  else {
-    while (++i < n) { // Find the first comparable value.
-      if ((value = valueof(values[i], i, values)) != null && value >= value) {
-        max = value;
-        while (++i < n) { // Compare the remaining values.
-          if ((value = valueof(values[i], i, values)) != null && value > max) {
-            max = value;
-          }
-        }
-      }
-    }
-  }
-
-  return max;
-};
 
 var array$1 = Array.prototype;
 
@@ -4237,18 +4237,90 @@ ReflectContext.prototype = {
   bezierCurveTo: function(x1, y1, x2, y2, x, y) { this._context.bezierCurveTo(y1, x1, y2, x2, y, x); }
 };
 
+function Natural(context) {
+  this._context = context;
+}
+
+Natural.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._x = [];
+    this._y = [];
+  },
+  lineEnd: function() {
+    var x = this._x,
+        y = this._y,
+        n = x.length;
+
+    if (n) {
+      this._line ? this._context.lineTo(x[0], y[0]) : this._context.moveTo(x[0], y[0]);
+      if (n === 2) {
+        this._context.lineTo(x[1], y[1]);
+      } else {
+        var px = controlPoints(x),
+            py = controlPoints(y);
+        for (var i0 = 0, i1 = 1; i1 < n; ++i0, ++i1) {
+          this._context.bezierCurveTo(px[0][i0], py[0][i0], px[1][i0], py[1][i0], x[i1], y[i1]);
+        }
+      }
+    }
+
+    if (this._line || (this._line !== 0 && n === 1)) this._context.closePath();
+    this._line = 1 - this._line;
+    this._x = this._y = null;
+  },
+  point: function(x, y) {
+    this._x.push(+x);
+    this._y.push(+y);
+  }
+};
+
+// See https://www.particleincell.com/2012/bezier-splines/ for derivation.
+function controlPoints(x) {
+  var i,
+      n = x.length - 1,
+      m,
+      a = new Array(n),
+      b = new Array(n),
+      r = new Array(n);
+  a[0] = 0, b[0] = 2, r[0] = x[0] + 2 * x[1];
+  for (i = 1; i < n - 1; ++i) a[i] = 1, b[i] = 4, r[i] = 4 * x[i] + 2 * x[i + 1];
+  a[n - 1] = 2, b[n - 1] = 7, r[n - 1] = 8 * x[n - 1] + x[n];
+  for (i = 1; i < n; ++i) m = a[i] / b[i - 1], b[i] -= m, r[i] -= m * r[i - 1];
+  a[n - 1] = r[n - 1] / b[n - 1];
+  for (i = n - 2; i >= 0; --i) a[i] = (r[i] - a[i + 1]) / b[i];
+  b[n - 1] = (x[n] + a[n - 1]) / 2;
+  for (i = 0; i < n - 1; ++i) b[i] = 2 * x[i + 1] - a[i + 1];
+  return [a, b];
+}
+
+var curveNatural = function(context) {
+  return new Natural(context);
+};
+
 var Line = /** @class */ (function () {
     function Line(options) {
         this.options = options;
         this.baseChart = this.options.baseChartOptions.el;
         this.init();
         this.draw();
+        this.drawCircle();
     }
+    Line.prototype.getCircles = function () {
+        return this.circles;
+    };
     Line.prototype.init = function () {
-        var width = this.options.baseChartOptions.size.width;
-        var height = this.options.baseChartOptions.size.height;
+        var _this = this;
+        this.width = this.options.baseChartOptions.size.width;
+        this.height = this.options.baseChartOptions.size.height;
+        this.boundary = this.options.baseChartOptions.boundary;
         this.xScale = linear().domain([2000, 2013])
-            .range([0, width - this.options.baseChartOptions.boundary.left - this.options.baseChartOptions.boundary.right]);
+            .range([0, this.width - this.boundary.left - this.boundary.right]);
         var rangeMax = 0;
         this.options.series.forEach(function (serie) {
             var cur = parseInt(max(serie.data), 10);
@@ -4257,13 +4329,18 @@ var Line = /** @class */ (function () {
             }
         });
         this.yScale = linear().domain([0, rangeMax * 1.1])
-            .range([height - this.options.baseChartOptions.boundary.top - this.options.baseChartOptions.boundary.bottom, 0]);
+            .range([this.height - this.options.baseChartOptions.boundary.top - this.options.baseChartOptions.boundary.bottom, 0]);
+        this.linePathGenerator = line().x(function (d) {
+            return Math.round(_this.xScale(d[0]));
+        }).y(function (d) {
+            return Math.round(_this.yScale(d[1]));
+        }).curve(curveNatural);
     };
     Line.prototype.draw = function () {
         var _this = this;
-        var domian = this.options.domain;
+        this.domian = this.options.domain;
         var input = Array(this.options.series.length).fill(0).slice().map(function (data, index) {
-            return domian.slice().map(function (innerData, innerIndex) {
+            return _this.domian.slice().map(function (innerData, innerIndex) {
                 return [innerData, _this.options.series[index].data[innerIndex]];
             });
         });
@@ -4273,7 +4350,7 @@ var Line = /** @class */ (function () {
             .append('path')
             .attr('transform', "translate(" + this.options.baseChartOptions.boundary.left + ", " + this.options.baseChartOptions.boundary.right + ")")
             .attr('d', function (d, i) {
-            return _this.linePath()(d);
+            return _this.linePathGenerator(d);
         })
             .attr('fill', 'none')
             .attr('stroke-width', 2)
@@ -4281,18 +4358,27 @@ var Line = /** @class */ (function () {
             return _this.options.series[i].lineStyle.color;
         });
     };
-    Line.prototype.linePath = function () {
+    Line.prototype.drawCircle = function () {
         var _this = this;
-        return line().x(function (d) {
-            return Math.round(_this.xScale(d[0]));
-        }).y(function (d) {
-            return Math.round(_this.yScale(d[1]));
-        });
+        this.circles = this.baseChart.selectAll('g')
+            .data(this.options.series)
+            .enter()
+            .append('g')
+            .attr('class', 'circle-wrap')
+            .attr('transform', function (d) {
+            return "translate(" + (_this.width - _this.boundary.right) + ", " + (_this.yScale(d.data[d.data.length - 1]) + _this.boundary.top) + ")";
+        })
+            .append('circle')
+            .attr('class', 'hover-dot')
+            .attr('fill', function (d) {
+            return d.lineStyle.color;
+        })
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', 5);
     };
     return Line;
 }());
-
-//# sourceMappingURL=line.js.map
 
 var BaseChart = /** @class */ (function (_super) {
     __extends(BaseChart, _super);
@@ -4310,6 +4396,7 @@ var BaseChart = /** @class */ (function (_super) {
     }
     BaseChart.prototype.init = function () {
         this.baseChartSize = this.options.size;
+        Object.assign(this.boundary, this.options.boundary);
         this.width = this.options.size.width;
         this.height = this.options.size.height;
         this.visibleSize = {
@@ -4333,8 +4420,6 @@ var BaseChart = /** @class */ (function (_super) {
     return BaseChart;
 }(Root));
 
-//# sourceMappingURL=baseChart.js.map
-
 var LineChart = /** @class */ (function (_super) {
     __extends(LineChart, _super);
     function LineChart(options) {
@@ -4357,11 +4442,12 @@ var LineChart = /** @class */ (function (_super) {
                 size: this.baseChartSize
             }
         });
+        this.circles = this.line.getCircles();
     };
     LineChart.prototype.drawAxis = function () {
         var x = new Coordinate({
             domain: Array(2013 - 2000 + 1).fill(0).slice().map(function (item, index) { return index + 2000; }),
-            baseChart: this.baseChart,
+            baseChart: this.getSelection(),
             position: 'bottom',
             offset: {
                 x: this.boundary.left,
@@ -4381,7 +4467,7 @@ var LineChart = /** @class */ (function (_super) {
         });
         var y = new Coordinate({
             domain: Array(14).fill(0).slice().map(function (d, i) { return i + 2000; }),
-            baseChart: this.baseChart,
+            baseChart: this.getSelection(),
             position: 'left',
             offset: {
                 x: this.boundary.left,
@@ -4416,9 +4502,24 @@ var LineChart = /** @class */ (function (_super) {
         }).on('mousemove', this.mouseMoveControler.bind(this));
     };
     LineChart.prototype.mouseMoveControler = function () {
+        var _this = this;
         var position = mouse(this.eventContainer.node());
         this.highlight.attr('x1', position[0])
             .attr('x2', position[0]);
+        var yPos = this.options.series.slice().map(function (serie) {
+            return _this.calculatePosition(_this.line.domian, Math.round(_this.line.xScale.invert(position[0] - _this.boundary.left)));
+        });
+        selectAll('.circle-wrap').data(this.options.series)
+            .attr('transform', function (d) {
+            return "translate(" + position[0] + ", " + (_this.line.yScale.invert(position[1]) + _this.boundary.top) + ")";
+            // return 'translate(0, 0)';
+        });
+    };
+    LineChart.prototype.calculatePosition = function (data, x0) {
+        var bisect = bisector(function (d) {
+            return d;
+        }).left;
+        return bisect(data, x0);
     };
     return LineChart;
 }(BaseChart));
@@ -4458,7 +4559,6 @@ var lineChart = new LineChart({
             data: [101310, 107590, 109800, 113020, 116550, 125710, 129710, 133560, 138490, 140350, 144950, 159050, 169370, 178980]
         }]
 });
-//# sourceMappingURL=index.js.map
 
 })));
 //# sourceMappingURL=bundle.js.map

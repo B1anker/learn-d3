@@ -43,6 +43,7 @@ export default class BaseChart extends Root {
 
   private init () {
     this.baseChartSize = this.options.size;
+    Object.assign(this.boundary, this.options.boundary);
     this.width = this.options.size.width;
     this.height = this.options.size.height;
     this.visibleSize = {
