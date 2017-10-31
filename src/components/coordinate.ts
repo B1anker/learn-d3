@@ -1,10 +1,11 @@
+import BaseChart from '@/charts/baseChart';
+import { BaseChartSize } from '@/define/interface';
+import { MultiParameter, MySelection, Weight } from '@/define/type';
+import generateId from '@/utils/id';
 import { Axis, axisBottom, axisLeft, axisRight, axisTop } from 'd3-axis';
 import { format } from 'd3-format';
 import { ScaleLinear } from 'd3-scale';
 import { EnterElement, select, Selection } from 'd3-selection';
-import BaseChart, { BaseChartSize } from '../charts/baseChart';
-import { MultiParameter, MySelection, Weight } from '../define/type';
-import generateId from '../utils/id';
 
 interface Offset {
   x: number;
@@ -44,6 +45,9 @@ interface CoordinateOptions {
   className?: string;
 }
 
+/*
+ * 坐标
+ */
 class Coordinate {
   private id: number;
   private options: CoordinateOptions;
@@ -68,7 +72,6 @@ class Coordinate {
 
   constructor (options: CoordinateOptions) {
     this.options = options;
-    this.combineOptionsAndDefault();
     this.init();
     this.draw();
   }
@@ -79,6 +82,7 @@ class Coordinate {
   }
 
   private init () {
+    this.combineOptionsAndDefault();
     this.id = generateId();
     switch (this.options.position) {
       case 'bottom':

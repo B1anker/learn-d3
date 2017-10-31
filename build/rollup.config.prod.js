@@ -1,15 +1,12 @@
 import typescript from 'rollup-plugin-typescript2'
-import serve from 'rollup-plugin-serve'
-import livereload from 'rollup-plugin-livereload'
-import browsersync from 'rollup-plugin-browsersync'
 import replace from 'rollup-plugin-replace'
 import nodeResolve from 'rollup-plugin-node-resolve'
-import sourcemaps from 'rollup-plugin-sourcemaps'
 import commonjs from 'rollup-plugin-commonjs'
 import ugliy from 'rollup-plugin-uglify'
-import hash from 'rollup-plugin-hash'
 import progress from 'rollup-plugin-progress'
 import alias from 'rollup-plugin-alias';
+import ejs from 'rollup-plugin-ejs';
+import scss from 'rollup-plugin-scss'
 import path from 'path'
 
 function resolve (direction) {
@@ -30,44 +27,32 @@ export default {
     alias({
       '@': resolve('../src')
     }),
-    sourcemaps(),
-    // ugliy(),
-    // hash({
-    //   dest: 'bundle/main.[hash].js',
-    //   replace: true
-    // }),
+    scss({
+      output: resolve('../dist/h3.min.css')
+    }),
+    ejs({
+      include: ['**/*.ejs', '**/*.html'],
+      exclude: ['**/index.html'],
+      compilerOptions: {
+        client: true
+      }
+    }),
+    ugliy(),
     commonjs({
       include: resolve('../node_modules/**'),
       extensions: ['.js', '.ts']
     }),
-    serve({
-      contentBase: resolve('../'),
-      port: 8080
-    }),
-    // livereload({
-    //   watch: resolve('../src'),
-    //   verbose: true
-    // }),
-    browsersync({
-      server: resolve('../'),
-      open: false
-    }),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    // progress({
-    //   clearLine: true // default: true
-    // })
+    progress({
+      clearLine: true // default: true
+    })
   ],
-
-  watch: {
-    include: resolve('../src/**')
-  },
 
   output: {
     format: 'umd',
     name: 'chart',
-    file: resolve('../dist/bundle.js'),
-    sourcemap: true
+    file: resolve('../dist/h3.min.js')
   }
 }

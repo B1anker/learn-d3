@@ -2,20 +2,35 @@
   "defaultSeverity": "error",
   "extends": "tslint:latest",
   "jsRules": {
-    
   },
   "rules": {
     "space-before-function-paren": true,
     "no-console": false,
     "max-line-length": false,
-    "quotemark": [true, "single", "jsx-double"],
-    "interface-name": [true, "never-prefix"],
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ],
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
     "object-literal-sort-keys": false,
-    "trailing-comma": [false, {
-      "multiline": "always",
-      "singleline": "never"
-    }],
+    "trailing-comma": [
+      false,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "no-trailing-whitespace": false,
+    "no-implicit-dependencies": false,
     "no-submodule-imports": false,
-    "unified-signatures": false
+    "unified-signatures": false,
+    "no-this-assignment": false,
+    "only-arrow-functions": false,
+    "no-unused-expression": false,
+    "no-bitwise": false
   }
 }

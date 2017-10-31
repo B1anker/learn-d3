@@ -1,0 +1,13 @@
+$disable: rgb(207, 207, 207);
+
+.legend-disActive {
+  stroke: $disable;
+
+  path {
+    stroke: $disable;
+  }
+
+  rect {
+    fill: $disable;
+  }
+}
